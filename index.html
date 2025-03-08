@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Quotes || Post on X</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="quote-box">
+        <h2>Quote Of The Day</h2>
+        <blockquote id="quote"></blockquote>
+        <span id="author"></span>
+        <div class="btns">
+            <button onclick="generateQuote()">New Quote</button>
+            <button onclick="post()"><img src="twitter_icon.png" alt="twitter_icon">Post</button>
+        </div>
+    </div>
+    
+    <!-- fetch quotes from an api -->
+    <script>
+        const quote = document.getElementById("quote");
+        const author = document.getElementById("author");
+
+        // asynchronous function that runs independently to fetch the quotes from an api
+        async function generateQuote() {
+            try{
+                const response = await fetch("quotes.json");
+                const data = await response.json();
+                const randomIndex = Math.floor(Math.random() * data.length);
+                quote.innerHTML= data[randomIndex].quote;
+                author.innerHTML = data[randomIndex].author;
+                saveQuote();
+            }catch(error){
+                console.log("Error fetching the quote:", error);
+            }
+        }
+
+        function post(){
+            const quoteText = encodeURIComponent(quote.innerHTML);
+            const authorText = encodeURIComponent(author.innerHTML);
+            const tweetUrl = `https://twitter.com/intent/tweet?text=${quoteText} - ${authorText}`;
+            window.open(tweetUrl, 'X-POST', 'width=600,height=400');
+        }
+
+        // save current quote to local storage
+        function saveQuote(){
+            localStorage.setItem('quote', quote.innerHTML);
+            localStorage.setItem('author', author.innerHTML);
+        }
+
+        function getQuote(){
+            quote.innerHTML = localStorage.getItem('quote') || "Your default quote here";
+            author.innerHTML = localStorage.getItem('author') || "Author name";
+        }
+
+        window.onload = getQuote;
+    </script>
+</body>
+</html>
